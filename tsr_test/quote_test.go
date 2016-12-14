@@ -16,11 +16,22 @@ type testCase struct {
 	err    error
 }
 
+func NewTestCase(name string, start float64, end float64, events []tsr.EventHandler, want float64, err error) testCase {
+	return testCase{
+		name:   name,
+		start:  decimal.NewFromFloat(start),
+		end:    decimal.NewFromFloat(end),
+		events: events,
+		want:   decimal.NewFromFloat(want),
+		err:    err,
+	}
+}
+
 func TestCalculateTSR(t *testing.T) {
 	var tests = []testCase{
-		{"Divide by zero", decimal.NewFromFloat(0.0), decimal.NewFromFloat(1.0), nil, decimal.NewFromFloat(0), tsr.ArgumentError{}},
-		{"Zero return", decimal.NewFromFloat(2.0), decimal.NewFromFloat(0.0), nil, decimal.NewFromFloat(0.0), nil},
-		{"No events", decimal.NewFromFloat(2.0), decimal.NewFromFloat(3.0), nil, decimal.NewFromFloat(1.5), nil},
+		NewTestCase("Divide by zero", 0, 1, nil, 0, tsr.ArgumentError{}),
+		NewTestCase("Zero return", 2, 0, nil, 0, nil),
+		NewTestCase("No events", 2, 3, nil, 1.5, nil),
 	}
 
 	for _, testcase := range tests {
