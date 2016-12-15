@@ -32,6 +32,13 @@ func TestCalculateTSR(t *testing.T) {
 		NewTestCase("Divide by zero", 0, 1, nil, 0, tsr.ArgumentError{}),
 		NewTestCase("Zero return", 2, 0, nil, 0, nil),
 		NewTestCase("No events", 2, 3, nil, 1.5, nil),
+		NewTestCase("With split", 2, 2, []tsr.EventHandler{
+			tsr.SplitEventHandler{decimal.NewFromFloat(1), decimal.NewFromFloat(3)},
+		}, 3, nil),
+		NewTestCase("With 2 splits", 2, 2, []tsr.EventHandler{
+			tsr.SplitEventHandler{decimal.NewFromFloat(1), decimal.NewFromFloat(3)},
+			tsr.SplitEventHandler{decimal.NewFromFloat(3), decimal.NewFromFloat(2)},
+		}, 2, nil),
 	}
 
 	for _, testcase := range tests {
@@ -53,8 +60,8 @@ func TestSplitEvent(t *testing.T) {
 	want := decimal.NewFromFloat(4.5)
 
 	event := tsr.SplitEventHandler{
-		Nominator:   decimal.NewFromFloat(3),
-		Denominator: decimal.NewFromFloat(2),
+		decimal.NewFromFloat(2),
+		decimal.NewFromFloat(3),
 	}
 
 	got := event.Adjust(decimal.NewFromFloat(3))

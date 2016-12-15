@@ -10,5 +10,12 @@ func CalculateReturn(start decimal.Decimal, end decimal.Decimal, events []EventH
 	if start.Cmp(decimal.NewFromFloat(0)) == 0 {
 		return decimal.NewFromFloat(0), ArgumentError{"start"}
 	}
-	return end.Div(start), nil
+
+	units := decimal.NewFromFloat(1).Div(start)
+
+	for _, e := range events {
+		units = e.Adjust(units)
+	}
+
+	return units.Mul(end), nil
 }
