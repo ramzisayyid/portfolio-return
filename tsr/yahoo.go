@@ -43,17 +43,21 @@ func (y *YahooService) GetLatestQuote(symbol string) (decimal.Decimal, error) {
 }
 
 func (y *YahooService) GetAverageQuote(symbol string, start time.Time, end time.Time) (decimal.Decimal, error) {
-	bars, err := finance.GetQuoteHistory(symbol, start, end, finance.IntervalDaily)
+	bars, err := finance.GetQuoteHistory(symbol, time.Now(), time.Now(), finance.IntervalDaily)
 
 	if err != nil {
 		return decimal.Zero, err
 	}
 
 	var avg decimal.Decimal
+	var days int
 
 	for _, p := range bars {
-		avg = avg.Add(p.Close)
+		if p.Date.After(start.AddDate(0, 0, -1)) && p.Date.Before(end) {
+			avg = avg.Add(p.Close)
+			days += 1
+		}
 	}
 
-	return avg.Div(decimal.NewFromFloat(float64(len(bars)))), nil
+	return avg.Div(decimal.NewFromFloat(float64(days))), nil
 }
