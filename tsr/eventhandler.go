@@ -5,7 +5,7 @@ import (
 )
 
 // EventHandler is an interface used to abstract adjustments to stock value
-// after a dividend or stock
+// after a dividend or a stock split
 type EventHandler interface {
 	Adjust(decimal.Decimal) decimal.Decimal
 }

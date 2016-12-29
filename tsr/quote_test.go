@@ -26,10 +26,13 @@ func NewTestCase(name string, start float64, end float64, events []EventHandler,
 	}
 }
 
-type MockDoublerEventHandler struct {}
+var nCalls int
 
-func (e MockDoublerEventHandler) Adjust(amount decimal.Decimal) decimal.Decimal {
-	return amount.Mul(decimal.NewFromFloat(2.0))
+type MockEventHandler struct{}
+
+func (e MockEventHandler) Adjust(amount decimal.Decimal) decimal.Decimal {
+	nCalls += 1
+	return amount
 }
 
 func TestCalculateTSR(t *testing.T) {
@@ -37,9 +40,6 @@ func TestCalculateTSR(t *testing.T) {
 		NewTestCase("Divide by zero", 0, 1, nil, 0, ArgumentError{}),
 		NewTestCase("Zero return", 2, 0, nil, 0, nil),
 		NewTestCase("No events", 2, 3, nil, 1.5, nil),
-		NewTestCase("With events", 2, 2, []EventHandler{
-			MockDoublerEventHandler{}, MockDoublerEventHandler{},
-		}, 4, nil),
 	}
 
 	for _, testcase := range tests {
@@ -57,3 +57,13 @@ func TestCalculateTSR(t *testing.T) {
 	}
 }
 
+func TestHandlerCalled(t *testing.T) {
+	nCalls = 0
+
+	CalculateReturn(decimal.NewFromFloat(1), decimal.NewFromFloat(1), []EventHandler{MockEventHandler{}, MockEventHandler{}})
+
+	if nCalls != 2 {
+		t.Errorf("For instruction %q, got %d calls, want %d calls.",
+			"Handler is called", nCalls, 2)
+	}
+}
